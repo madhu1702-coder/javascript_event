@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interactive JS User Form with 10 Events</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  font-family: Arial, sans-serif;
+  background: #000000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition: background 0.5s ease;
+}
+
+.box{
+  width:360px;
+  max-height:520px;
+  padding:25px;
+  border-radius:15px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(14px);
+  color:#fff;
+  overflow-y:auto;
+  position:relative;
+  transition: background 0.5s ease;
+  pointer-events: none;
+}
+
+.box *{
+  pointer-events: auto;
+}
+
+.box::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:16px;
+  background: linear-gradient(270deg,#00f0ff,#ff00ff,#00ff6a,#00f0ff);
+  background-size:600% 600%;
+  animation: neon 6s linear infinite;
+  z-index:-1;
+  filter:blur(6px);
+}
+
+@keyframes neon{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+h2{text-align:center;}
+
+input,textarea{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:8px;
+  border:none;
+  outline:none;
+}
+
+textarea{resize:none;}
+
+button{
+  padding:10px;
+  width:48%;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  box-shadow:0 0 12px rgba(0,255,255,.7),
+             0 0 25px rgba(255,0,255,.7);
+}
+
+button:hover{
+  box-shadow:0 0 18px rgba(0,255,255,1),
+             0 0 35px rgba(255,0,255,1);
+  transform:scale(1.05);
+}
+
+#msg{text-align:center;margin-top:10px;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+td{padding:6px;}
+</style>
+</head>
+
+<body 
+  onload="eventHandler('Page Loaded','#000','#444')"
+  onclick="eventHandler('Body Clicked','#111','#555')"
+  ondblclick="eventHandler('Body Double Clicked','#222','#666')"
+  onmousemove="eventHandler('Mouse Moving','#333','#777')"
+  onkeydown="eventHandler('Key Down','#444','#888')"
+  onkeyup="eventHandler('Key Up','#555','#aaa')"
+  onmousedown="eventHandler('Mouse Down','#666','#ccc')"
+  onmouseup="eventHandler('Mouse Up','#777','#ddd')"
+  oncontextmenu="eventHandler('Right Click Disabled','#888','#eee'); return false;"
+  onresize="eventHandler('Window Resized','#999','#fff')"
+  onscroll="eventHandler('Window Scrolled','#aaa','#ccc')"
+>
+
+<div class="box" 
+     onmouseover="eventHandler('Box Hover','#ff0','#ffa')"
+     onmouseout="eventHandler('Box Out','#0ff','#aaf')"
+>
+<h2>User Form</h2>
+
+<form onsubmit="submitForm(event)" onreset="resetForm()">
+
+<input type="text" style="display:none">
+
+<input type="text" id="username"
+ placeholder="Enter Name"
+ autocomplete="off"
+ readonly
+ onfocus="this.removeAttribute('readonly')"
+ oninput="validateName(); colorChange('username')">
+
+<input type="email" id="email"
+ placeholder="Enter Email"
+ autocomplete="off"
+ readonly
+ onfocus="this.removeAttribute('readonly')"
+ oninput="validateEmail(); colorChange('email')">
+
+<input type="date" id="dob"
+ autocomplete="off"
+ readonly
+ onfocus="this.removeAttribute('readonly')">
+
+<textarea id="address"
+ placeholder="Enter Address"
+ autocomplete="off"
+ readonly
+ onfocus="this.removeAttribute('readonly')"></textarea>
+
+<input type="tel" id="mobile"
+ placeholder="Enter Mobile Number"
+ autocomplete="off"
+ readonly
+ onfocus="this.removeAttribute('readonly')"
+ oninput="validateMobile(); colorChange('mobile')">
+
+<div style="display:flex;justify-content:space-between;">
+<button type="submit">Submit</button>
+<button type="reset">Reset</button>
+</div>
+
+</form>
+
+<div id="msg"></div>
+<div id="output"></div>
+</div>
+
+<script>
+const msg=document.getElementById("msg");
+const box=document.querySelector(".box");
+
+// Body & Box event handler
+function eventHandler(text,bodyColor,boxColor){
+  msg.innerText=text;
+  document.body.style.background=bodyColor;
+  box.style.background=boxColor;
+}
+
+// Typing color change
+function colorChange(field){
+  let boxColor='#000';
+  let bodyColor='#111';
+  
+  if(field==='username'){
+    boxColor='rgba(255, 0, 0, 0.5)';
+    bodyColor='#330000';
+  } else if(field==='email'){
+    boxColor='rgba(0, 255, 0, 0.5)';
+    bodyColor='#003300';
+  } else if(field==='mobile'){
+    boxColor='rgba(0, 0, 255, 0.5)';
+    bodyColor='#000033';
+  }
+  box.style.background=boxColor;
+  document.body.style.background=bodyColor;
+}
+
+// Validate Name
+function validateName(){
+  const val=document.getElementById("username").value;
+  if(val.length>0){
+    if(!/^[A-Z]/.test(val)){
+      msg.innerText = "Name should start with a capital letter ⚠";
+      return false;
+    } else {
+      msg.innerText = "Typing detected (soft check passed)";
+      return true;
+    }
+  }
+  return true;
+}
+
+// Validate Email
+function validateEmail(){
+  const val=document.getElementById("email").value;
+  if(val.length>0){
+    if(!/^[a-z]/.test(val)){
+      msg.innerText = "Email should start with a lowercase letter ⚠";
+      return false;
+    } else if(!/^[a-z0-9._@]*$/.test(val)){
+      msg.innerText = "Only letters, numbers, ., _, @ allowed ⚠";
+      return false;
+    } else {
+      msg.innerText = "Typing detected (soft check passed)";
+      return true;
+    }
+  }
+  return true;
+}
+
+// Validate Mobile
+function validateMobile(){
+  const val=document.getElementById("mobile").value;
+  if(val.length>0){
+    if(!/^\d{10}$/.test(val)){
+      msg.innerText = "Mobile number must be exactly 10 digits ⚠";
+      return false;
+    } else {
+      msg.innerText = "Typing detected (soft check passed)";
+      return true;
+    }
+  }
+  return true;
+}
+
+// Submit form
+function submitForm(e){
+  e.preventDefault();
+
+  const name=document.getElementById("username").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const dob=document.getElementById("dob").value.trim();
+  const address=document.getElementById("address").value.trim();
+  const mobile=document.getElementById("mobile").value.trim();
+
+  if(!validateName() || !validateEmail() || !validateMobile()){
+    msg.innerText = "Please correct the errors before submitting ⚠";
+    return;
+  }
+
+  document.getElementById("output").innerHTML=`
+  <h3 style="text-align:center;">Entered Details</h3>
+  <table>
+    <tr><td><b>Name</b></td><td>${name}</td></tr>
+    <tr><td><b>Email</b></td><td>${email}</td></tr>
+    <tr><td><b>DOB</b></td><td>${dob}</td></tr>
+    <tr><td><b>Address</b></td><td>${address}</td></tr>
+    <tr><td><b>Mobile</b></td><td>${mobile}</td></tr>
+  </table>`;
+
+  msg.innerText="Details displayed successfully ✅";
+}
+
+// Reset form
+function resetForm(){
+  document.getElementById("output").innerHTML="";
+  msg.innerText="Form reset";
+  box.style.background='rgba(255,255,255,0.3)';
+  document.body.style.background='#000';
+}
+</script>
+
+</body>
+</html>
