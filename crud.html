@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced CRUD Operations</title>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#000;
+  font-family:Segoe UI,Arial;
+  color:#FFD700;
+}
+
+/* BOX */
+.box{
+  width:420px;
+  padding:25px;
+  background:#0a0a0a;
+  border-radius:20px;
+  box-shadow:
+    0 0 35px #FFD700,
+    inset 0 0 18px rgba(255,215,0,0.25);
+}
+
+/* HEADING */
+h2{
+  text-align:center;
+  margin-bottom:15px;
+}
+
+/* INPUTS */
+input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:none;
+  border-radius:8px;
+  background:#141414;
+  color:#FFD700;
+  outline:none;
+}
+
+/* BUTTON GROUP */
+.btn-group{
+  display:flex;
+  gap:6px;
+  margin-top:12px;
+}
+
+/* BUTTONS */
+button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  position:relative;
+  overflow:hidden;
+  transition:transform .2s, box-shadow .2s;
+}
+
+/* CLICK ANIMATION */
+button:active{
+  transform:scale(0.93);
+  box-shadow:0 0 20px #FFD700;
+}
+
+/* COLORS */
+.create{background:#FFD700;}
+.read{background:#333;color:#FFD700;}
+.update{background:#888;}
+.delete{background:#b30000;color:#fff;}
+
+/* TABLE */
+table{
+  width:100%;
+  margin-top:18px;
+  border-collapse:collapse;
+  font-size:14px;
+}
+th,td{
+  padding:6px;
+  border-bottom:1px solid rgba(255,215,0,.4);
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Advanced CRUD Operations</h2>
+
+  <!-- PREVENT AUTOFILL -->
+  <form autocomplete="off">
+    <input type="text" style="display:none">
+  </form>
+
+  <!-- INPUTS -->
+  <input type="number" id="id" placeholder="ID (Update / Delete)" autocomplete="off">
+  <input type="text" id="name" placeholder="Enter Name" autocomplete="off">
+  <input type="email" id="email" placeholder="Enter Email" autocomplete="off">
+
+  <!-- CRUD BUTTONS -->
+  <div class="btn-group">
+    <button class="create" onclick="createData()">Create</button>
+    <button class="read" onclick="readData()">Read</button>
+    <button class="update" onclick="updateData()">Update</button>
+    <button class="delete" onclick="deleteData()">Delete</button>
+  </div>
+
+  <!-- OUTPUT -->
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Email</th></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+let records = JSON.parse(localStorage.getItem("records")) || [];
+
+/* FORCE CLEAR AUTOFILL */
+window.onload = ()=>{
+  idEl().value="";
+  nameEl().value="";
+  emailEl().value="";
+  readData();
+};
+
+/* CREATE */
+function createData(){
+  let n=nameEl().value.trim();
+  let e=emailEl().value.trim();
+  if(!n||!e) return alert("Enter Name & Email");
+
+  let id = records.length + 1;
+  records.push({id,name:n,email:e});
+  save(); clear(); readData();
+}
+
+/* READ */
+function readData(){
+  let tb=document.getElementById("tbody");
+  tb.innerHTML="";
+  records.forEach(r=>{
+    let tr=document.createElement("tr");
+    tr.innerHTML=`<td>${r.id}</td><td>${r.name}</td><td>${r.email}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* UPDATE */
+function updateData(){
+  let id=Number(idEl().value);
+  let r=records.find(x=>x.id===id);
+  if(!r) return alert("Invalid ID");
+
+  r.name=nameEl().value;
+  r.email=emailEl().value;
+  save(); clear(); readData();
+}
+
+/* DELETE */
+function deleteData(){
+  let id=Number(idEl().value);
+  records=records.filter(r=>r.id!==id);
+  records.forEach((r,i)=>r.id=i+1);
+  save(); clear(); readData();
+}
+
+/* HELPERS */
+function save(){localStorage.setItem("records",JSON.stringify(records))}
+function clear(){idEl().value="";nameEl().value="";emailEl().value=""}
+function idEl(){return document.getElementById("id")}
+function nameEl(){return document.getElementById("name")}
+function emailEl(){return document.getElementById("email")}
+</script>
+
+</body>
+</html>
